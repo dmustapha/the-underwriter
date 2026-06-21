@@ -1,0 +1,9 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="14" fill="#14100E"/>
+  <rect x="3.25" y="3.25" width="57.5" height="57.5" rx="11.5" fill="none" stroke="#C8A24A" stroke-opacity="0.32" stroke-width="1.5"/>
+  <!-- serif U monogram -->
+  <path d="M21 18 V32 C21 39 26 43.5 32 43.5 C38 43.5 43 39 43 32 V18" stroke="#C8A24A" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M17 18 H25 M39 18 H47" stroke="#C8A24A" stroke-width="3.4" stroke-linecap="round"/>
+  <!-- the underwrite floor line -->
+  <path d="M19 51 H45" stroke="#C8A24A" stroke-width="4" stroke-linecap="round"/>
+</svg>

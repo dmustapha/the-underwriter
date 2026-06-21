@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+
+# Build artifacts
+.next/
+dist/
+build/
+next-env.d.ts
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# Secrets
+.env
+.env.local
+.env*.local
+
+# Platform
+.vercel
+
+# OS / editor
+.DS_Store
+*.log
+
+# Local working notes & internal docs (not part of the shipped product)
+PRD.md
+PLAN.md
+ARCHITECTURE.md
+BACKLOG.md
+DEEP-RESEARCH.md
+DESIGN_BRIEF.md
+DESIGN_SYSTEM.md
+FEATURE-OBSERVABLES.md
+DEMO-NOTES.md
+concerns.md
+prompt.md
+brand.json
+PULSE.md
+pipeline-log.md
+*-REPORT.md
+*-PLAN.md
+TESTING-PLAN.md
+.*-state.json
+ai/
+debug-results/
+design-variations/
+proposals/
+research/
+warroom/
+docs/context/
+screenshots/
+SUBMISSION-DETAILS.md

@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="The Underwriter">
+  <rect width="64" height="64" rx="14" fill="#F0B90B"/>
+  <!-- U: two posts + bowl = the envelope that holds the position -->
+  <path d="M20 16 V34 a12 12 0 0 0 24 0 V16" stroke="#141100" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <!-- the underwriting floor (drawdown guard) -->
+  <rect x="18" y="48" width="28" height="4" rx="2" fill="#141100"/>
+</svg>

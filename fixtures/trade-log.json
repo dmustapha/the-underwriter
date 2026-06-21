@@ -1,0 +1,93 @@
+[
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1640563200000,
+    "entryPrice": 563.7,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1641081600000,
+    "entryPrice": 531,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1643932800000,
+    "entryPrice": 399.5,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1646265600000,
+    "entryPrice": 402.6,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1647561600000,
+    "entryPrice": 397.2,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1653264000000,
+    "entryPrice": 317.2,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1653868800000,
+    "entryPrice": 321.8,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1656288000000,
+    "entryPrice": 233.8,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1657670400000,
+    "entryPrice": 230.5,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1662681600000,
+    "entryPrice": 293.4,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1664323200000,
+    "entryPrice": 281.6,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1666569600000,
+    "entryPrice": 274.1,
+    "intendedSize": 12000
+  },
+  {
+    "token": "BNB",
+    "side": "long",
+    "entryTs": 1669334400000,
+    "entryPrice": 300.8,
+    "intendedSize": 12000
+  }
+]

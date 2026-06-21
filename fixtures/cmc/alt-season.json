@@ -1,0 +1,19 @@
+{
+  "data": {
+    "altcoin_index": 41,
+    "altcoin_marketcap": 912237651409.84,
+    "snapshot_time": "2026-06-20T20:48:15Z",
+    "yearly_high": 78,
+    "yearly_high_date": "2025-09-20",
+    "yearly_low": 14,
+    "yearly_low_date": "2025-12-19"
+  },
+  "status": {
+    "timestamp": "2026-06-20T20:54:56.994Z",
+    "error_code": 0,
+    "error_message": null,
+    "elapsed": 4,
+    "credit_count": 0,
+    "notice": null
+  }
+}

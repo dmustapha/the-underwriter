@@ -1,0 +1,127 @@
+{
+  "data": [
+    {
+      "tags": [
+        {
+          "slug": "marketplace",
+          "name": "Marketplace",
+          "category": "INDUSTRY"
+        },
+        {
+          "slug": "centralized-exchange",
+          "name": "Centralized Exchange (CEX) Token",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "payments",
+          "name": "Payments",
+          "category": "INDUSTRY"
+        },
+        {
+          "slug": "smart-contracts",
+          "name": "Smart Contracts",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "alameda-research-portfolio",
+          "name": "Alameda Research Portfolio",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "multicoin-capital-portfolio",
+          "name": "Multicoin Capital Portfolio",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "bnb-chain-ecosystem",
+          "name": "BNB Chain Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "layer-1",
+          "name": "Layer 1",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "alleged-sec-securities",
+          "name": "Alleged SEC Securities",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "celsius-bankruptcy-estate",
+          "name": "Celsius Bankruptcy Estate",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "binance-ecosystem",
+          "name": "Binance Ecosystem",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "binance-listing",
+          "name": "Binance Listing",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "etherlink-ecosystem",
+          "name": "Etherlink Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "made-in-china",
+          "name": "Made in China",
+          "category": "CATEGORY"
+        }
+      ],
+      "id": 1839,
+      "name": "BNB",
+      "symbol": "BNB",
+      "slug": "bnb",
+      "is_active": 1,
+      "infinite_supply": false,
+      "is_fiat": 0,
+      "circulating_supply": 134783416.1,
+      "total_supply": 134783416.1,
+      "max_supply": 134783416.57999998,
+      "date_added": "2017-07-25T00:00:00.000Z",
+      "num_market_pairs": 3281,
+      "cmc_rank": 4,
+      "last_updated": "2026-06-20T20:53:00.000Z",
+      "tvl_ratio": null,
+      "platform": null,
+      "self_reported_circulating_supply": null,
+      "self_reported_market_cap": null,
+      "minted_market_cap": 78902619787.23,
+      "quote": [
+        {
+          "id": 2781,
+          "symbol": "USD",
+          "price": 585.403027095644,
+          "volume_24h": 833672732.4177738,
+          "volume_change_24h": -6.4262,
+          "cex_volume_24h": 817112974.9495752,
+          "dex_volume_24h": 16559757.46819872,
+          "percent_change_1h": -0.01657793,
+          "percent_change_24h": 0.86739571,
+          "percent_change_7d": -3.79087654,
+          "percent_change_30d": -10.93818058,
+          "percent_change_60d": -7.03252546,
+          "percent_change_90d": -6.8643558,
+          "market_cap": 78902619787.23177,
+          "market_cap_dominance": 3.6001,
+          "fully_diluted_market_cap": 78902620068.23,
+          "minted_market_cap": 78902619787.23,
+          "tvl": null,
+          "last_updated": "2026-06-20T20:53:04.000Z"
+        }
+      ]
+    }
+  ],
+  "status": {
+    "timestamp": "2026-06-20T20:54:37.202Z",
+    "error_code": "0",
+    "error_message": "",
+    "elapsed": 5,
+    "credit_count": 1
+  }
+}

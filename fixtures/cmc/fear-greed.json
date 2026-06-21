@@ -1,0 +1,14 @@
+{
+  "data": {
+    "value": 21,
+    "update_time": "2026-06-20T20:53:10.023Z",
+    "value_classification": "Fear"
+  },
+  "status": {
+    "timestamp": "2026-06-20T20:54:55.516Z",
+    "error_code": "0",
+    "error_message": "",
+    "elapsed": 2,
+    "credit_count": 0
+  }
+}

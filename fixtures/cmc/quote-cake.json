@@ -1,0 +1,178 @@
+{
+  "data": [
+    {
+      "tags": [
+        {
+          "slug": "collectibles-nfts",
+          "name": "Collectibles & NFTs",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "decentralized-exchange-dex-token",
+          "name": "Decentralized Exchange (DEX) Token",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "defi",
+          "name": "DeFi",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "derivatives",
+          "name": "Derivatives",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "smart-contracts",
+          "name": "Smart Contracts",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "ethereum-ecosystem",
+          "name": "Ethereum Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "yield-farming",
+          "name": "Yield Farming",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "amm",
+          "name": "AMM",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "dex",
+          "name": "DEX",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "governance",
+          "name": "Governance",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "solana-ecosystem",
+          "name": "Solana Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "arbitrum-ecosystem",
+          "name": "Arbitrum Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "bnb-chain-ecosystem",
+          "name": "BNB Chain Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "aptos-ecosystem",
+          "name": "Aptos Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "zksync-era-ecosystem",
+          "name": "zkSync Era Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "base-ecosystem",
+          "name": "Base Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "linea-ecosystem",
+          "name": "Linea Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "move-vm",
+          "name": "MoveVM (MVM)",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "polygon-zkevm-ecosystem",
+          "name": "Polygon zkEVM Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "opbnb-ecosystem",
+          "name": "opBNB Ecosystem",
+          "category": "PLATFORM"
+        },
+        {
+          "slug": "binance-ecosystem",
+          "name": "Binance Ecosystem",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "binance-listing",
+          "name": "Binance Listing",
+          "category": "CATEGORY"
+        },
+        {
+          "slug": "perpetuals",
+          "name": "Perpetuals",
+          "category": "CATEGORY"
+        }
+      ],
+      "id": 7186,
+      "name": "PancakeSwap",
+      "symbol": "CAKE",
+      "slug": "pancakeswap",
+      "is_active": 1,
+      "infinite_supply": false,
+      "is_fiat": 0,
+      "circulating_supply": 324094702.8909452,
+      "total_supply": 336469170.4500047,
+      "max_supply": 400000000,
+      "date_added": "2020-09-25T00:00:00.000Z",
+      "num_market_pairs": 1870,
+      "cmc_rank": 84,
+      "last_updated": "2026-06-20T17:29:00.000Z",
+      "tvl_ratio": 0.21079774,
+      "platform": {
+        "id": 1027,
+        "slug": "ethereum",
+        "name": "Ethereum",
+        "symbol": "ETH",
+        "token_address": "0x152649eA73beAb28c5b49B26eb48f7EAD6d4c898"
+      },
+      "self_reported_circulating_supply": null,
+      "self_reported_market_cap": null,
+      "minted_market_cap": 459487400.94,
+      "quote": [
+        {
+          "id": 2781,
+          "symbol": "USD",
+          "price": 1.3656151626641655,
+          "volume_24h": 18005119.8835045,
+          "volume_change_24h": -31.4082,
+          "cex_volume_24h": 15161673.73974703,
+          "dex_volume_24h": 2843446.14375748,
+          "percent_change_1h": -0.27505659,
+          "percent_change_24h": -0.84544052,
+          "percent_change_7d": 2.23785087,
+          "percent_change_30d": -6.28708038,
+          "percent_change_60d": -10.65281505,
+          "percent_change_90d": -0.868604,
+          "market_cap": 442588640.4070125,
+          "market_cap_dominance": 0.0202,
+          "fully_diluted_market_cap": 546246065.07,
+          "minted_market_cap": 459487400.94,
+          "tvl": 2099589147,
+          "last_updated": "2026-06-20T17:30:03.000Z"
+        }
+      ]
+    }
+  ],
+  "status": {
+    "timestamp": "2026-06-20T17:31:42.391Z",
+    "error_code": "0",
+    "error_message": "",
+    "elapsed": 4,
+    "credit_count": 1
+  }
+}
