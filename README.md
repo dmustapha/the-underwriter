@@ -5,7 +5,7 @@ The Underwriter turns a proposed crypto trade into a full risk envelope: positio
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![x402](https://img.shields.io/badge/x402-USDC_on_Base-0052FF)](https://basescan.org/address/0x33ba73912604b678B1A53FF174D06Cd49d9b5728)
-[![Tests](https://img.shields.io/badge/tests-51_passing-brightgreen)]()
+[![Tests](https://img.shields.io/badge/tests-114_passing-brightgreen)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Live:** [the-underwriter.vercel.app](https://the-underwriter.vercel.app)
@@ -30,6 +30,18 @@ It pays for its market data per call over x402 (no API key required) and proves 
 
 ---
 
+## The forkable skill
+
+The product is the skill at [`skill/the-underwriter/SKILL.md`](skill/the-underwriter/SKILL.md). It composes CoinMarketCap MCP tools (search, quotes, technical analysis, global metrics, derivatives) into the underwriting workflow, declines on missing signals, and returns a structured risk envelope. Install it into an agent with a copy, no package manager:
+
+```bash
+cp -r the-underwriter/skill/the-underwriter ~/.your-agent/skills/
+```
+
+The Skill is self-contained and matches the deployed engine exactly: 2:1 reward:risk floor, regime-scaled fixed-fractional sizing, a drawdown governor, and DECLINE-as-exclusion. The defaults (equity $10,000, 30% drawdown budget) are the one knob a forker overrides for their own book.
+
+---
+
 ## Screenshots
 
 | The desk (live underwrite) | On-chain proof |
@@ -44,10 +56,11 @@ It pays for its market data per call over x402 (no API key required) and proves 
 
 - **Levels, never invented.** Stop and take-profit come from CoinMarketCap-method pivots and Fibonacci levels computed from live daily candles. If the levels are missing, the trade declines rather than guessing.
 - **DECLINE is a real exclusion.** A trade below the 2:1 reward:risk floor is rejected, not silently shrunk to a token size.
-- **Drawdown governor.** Position size is clamped to a fraction of the remaining drawdown budget, so one stop-out cannot breach the max-drawdown limit.
+- **Directional, momentum-aware regime.** Froth (greed, altcoin rotation, market risk) shrinks longs but not shorts, and an RSI gate shrinks a long that is overbought or a short that is oversold.
+- **Drawdown governor.** Position size is clamped to a fraction of the remaining drawdown budget, so one stop-out cannot breach the max-drawdown limit. An exhausted budget halts to DECLINE, never a zero-size APPROVE.
 - **Value-of-information metering.** Cheap regime signals are read first. The expensive derivatives pull is bought only when the regime is ambiguous.
 - **Pay-per-call data over x402.** Each underwrite settles a real USDC micropayment on Base and returns the transaction hash as proof the data was real.
-- **Forkable skill.** The whole capability ships as one `SKILL.md` in the CoinMarketCap Agent Skills format. Install it with `cp`, no package manager.
+- **Forkable skill.** The whole capability ships as one `SKILL.md` in the CoinMarketCap Agent Skills format.
 
 ---
 
@@ -61,7 +74,7 @@ POST /api/underwrite  ->  guards: token allowlist, finite bounds, same-origin, a
    |
    |-- CoinMarketCap x402     -> pays $0.01 USDC on Base  -> live quote price = entry
    |-- Bybit daily klines     -> CMC-method pivots + Fibonacci -> support / resistance
-   |-- CMC Fear&Greed + Alt   -> regime multiplier (escalates to derivatives only if ambiguous)
+   |-- CMC Fear&Greed + Alt   -> directional + RSI-aware regime (escalates to derivatives only if ambiguous)
    v
 Underwriting engine
    - stop = nearest support, take-profit = nearest resistance
@@ -73,7 +86,7 @@ Risk envelope { verdict, size, stop, takeProfit, rewardRisk, reason, receipts[] 
 
 ### Why levels come from Bybit, not Binance
 
-Binance returns HTTP 451 from US datacenter IPs, so it is unusable from a serverless deploy. Bybit's public v5 market data is reachable and covers every demo token. The serverless functions run in the `fra1` region for that reason. The levels are computed with the same routine the backtest uses, so the live path and the proven backtest stay numerically consistent.
+Binance returns HTTP 451 from US datacenter IPs, so it is unusable from a serverless deploy. Bybit's public v5 market data is reachable and covers every demo token, with OKX as a secondary failover. The serverless functions run in the `fra1` region for that reason. The levels are computed with the same routine the backtest uses, so the live path and the proven backtest stay numerically consistent.
 
 ### The drawdown governor
 
@@ -112,9 +125,46 @@ pnpm seed && pnpm backtest fixtures/trade-log-momentum.json BNBUSDT 1d
 | Charts | Recharts |
 | Engine | TypeScript (pivots, Fibonacci, RSI, regime, drawdown governor) |
 | Payments | x402 (`@x402/fetch`, `@x402/evm`), viem, USDC on Base |
-| Market data | CoinMarketCap x402 quotes + Fear&Greed + Altcoin-Season, Bybit v5 klines |
+| Market data | CoinMarketCap x402 quotes + Fear&Greed + Altcoin-Season, Bybit v5 klines (OKX failover) |
 | Tests | Vitest |
 | Deploy | Vercel (`fra1`) |
+
+---
+
+## Try It (2 minutes)
+
+1. Go to [the-underwriter.vercel.app/desk](https://the-underwriter.vercel.app/desk).
+2. Pick a token (BNB, CAKE, BTC, ETH, or SOL) and a side.
+3. Enter a size, and optionally an entry price. Leave entry blank to use the live quote.
+4. Click **Underwrite this trade**.
+5. Read the verdict, the stop and target, the reward:risk, and the reason.
+6. Open the on-chain receipt on the envelope to verify the data pull settled on Base.
+
+---
+
+## Running Locally
+
+```bash
+git clone https://github.com/dmustapha/the-underwriter.git
+cd the-underwriter
+pnpm install
+
+# run the test suite
+pnpm test
+
+# run the dev server (keyless: no payments, serves the cached experience)
+X402_PRIVATE_KEY="" pnpm dev
+```
+
+Open http://localhost:3000. With no keys the app runs the full flow against the committed fixtures and never spends anything. Add a funded Base USDC key to settle real x402 payments.
+
+### Required Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `X402_PRIVATE_KEY` | Base wallet private key used to pay for x402 data pulls. Leave empty to run keyless. |
+| `CMC_PRO_API_KEY` | Optional CoinMarketCap REST key, used as a fallback when x402 is unavailable. |
+| `CMC_MCP_API_KEY` | Optional CoinMarketCap MCP key for live technical-analysis reads. |
 
 ---
 
@@ -122,21 +172,10 @@ pnpm seed && pnpm backtest fixtures/trade-log-momentum.json BNBUSDT 1d
 
 ```bash
 pnpm test
-# Result: 51/51 passing
+# Result: 114/114 passing
 ```
 
-The suite covers the engine math (envelope, governor, indicators), the client-to-engine data pipeline on the real committed fixtures, the ablation oracle, security and numeric edge cases (negative/NaN/zero size, degraded signals), and the pay guard. A separate `tests/debug-p4-e2e.sh` drives the running API end to end.
-
----
-
-## Try It (2 minutes)
-
-1. Go to [the-underwriter.vercel.app/desk](https://the-underwriter.vercel.app/desk).
-2. Pick a token (BNB or CAKE) and a side.
-3. Enter a size, and optionally an entry price. Leave entry blank to use the live quote.
-4. Click **Underwrite this trade**.
-5. Read the verdict, the stop and target, the reward:risk, and the reason.
-6. Open the on-chain receipt on the envelope to verify the data pull settled on Base.
+The suite covers the engine math (envelope, governor, indicators, directional + RSI regime), the client-to-engine data pipeline on the real committed fixtures, the ablation oracle and Day-2 gate margin, the x402 fallback chain and receipt handling, the Bybit/OKX market-data client, the level-degeneracy guard, and security/numeric edge cases (negative/NaN/zero size, degraded signals, the pay guard). A separate `tests/debug-p4-e2e.sh` drives the running API end to end.
 
 ---
 
@@ -179,7 +218,7 @@ Response (abridged):
 
 ## On-Chain Verification
 
-Every paid data pull settles real USDC on Base mainnet (eip155:8453), $0.01 per call, gasless EIP-3009.
+Every paid data pull settles real USDC on Base mainnet (eip155:8453), $0.01 per call, gasless EIP-3009. Because settlement is gasless, the transaction is relayed by the x402 facilitator: the tx-level `from` is the relayer, and the $0.01 moves from the payer wallet as the USDC Transfer-event `from`, verifiable in the logs.
 
 | What | Address / Link |
 |------|----------------|
@@ -189,42 +228,6 @@ Every paid data pull settles real USDC on Base mainnet (eip155:8453), $0.01 per 
 | Deployed-runtime settlement | [tx `0x600706...`](https://basescan.org/tx/0x6007062572f137fc12b4977c878c4ca79716b354f9b941cf22615eab1ca88222) |
 
 More receipts and the full audit trail are in [`submission/proof.md`](submission/proof.md) and on the [proof page](https://the-underwriter.vercel.app/proof).
-
----
-
-## Running Locally
-
-```bash
-git clone https://github.com/dmustapha/the-underwriter.git
-cd the-underwriter
-pnpm install
-
-# run the test suite
-pnpm test
-
-# run the dev server (keyless: no payments, serves the cached experience)
-X402_PRIVATE_KEY="" pnpm dev
-```
-
-Open http://localhost:3000. With no keys the app runs the full flow against the committed fixtures and never spends anything. Add a funded Base USDC key to settle real x402 payments.
-
-### Required Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `X402_PRIVATE_KEY` | Base wallet private key used to pay for x402 data pulls. Leave empty to run keyless. |
-| `CMC_PRO_API_KEY` | Optional CoinMarketCap REST key, used as a fallback when x402 is unavailable. |
-| `CMC_MCP_API_KEY` | Optional CoinMarketCap MCP key for live technical-analysis reads. |
-
----
-
-## The forkable skill
-
-The product is the skill at [`skill/the-underwriter/SKILL.md`](skill/the-underwriter/SKILL.md). It composes CoinMarketCap MCP tools (search, quotes, technical analysis, global metrics, derivatives) into the underwriting workflow, declines on missing signals, and returns a structured risk envelope. Install it into an agent:
-
-```bash
-cp -r the-underwriter/skill/the-underwriter ~/.your-agent/skills/
-```
 
 ---
 
@@ -239,7 +242,7 @@ the-underwriter/
 │   └── components/          # UnderwriteDesk, AblationChart, EnvelopeCard, ...
 ├── src/
 │   ├── engine/              # envelope, governor, regime, indicators (the math)
-│   ├── clients/             # cmcClient (x402), cmcAdapter, marketData (Bybit)
+│   ├── clients/             # cmcClient (x402), cmcAdapter, marketData (Bybit/OKX)
 │   ├── backtest/            # the ablation
 │   └── server/              # pay guard
 ├── skill/the-underwriter/   # the forkable SKILL.md
