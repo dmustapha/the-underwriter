@@ -117,6 +117,18 @@ pnpm seed && pnpm backtest fixtures/trade-log-momentum.json BNBUSDT 1d
 
 ---
 
+## Watch an agent actually use it
+
+The whole pitch is "an agent underwrites a trade before it places it." Here is that loop, runnable and offline — a momentum agent (RSI × MACD × Fear&Greed) hands all 13 signals to The Underwriter and acts on each verdict, carrying its account state across the session:
+
+```bash
+pnpm example
+```
+
+It declines 7 trades (reward below the 2:1 floor), sizes down 4, approves 2. The underwritten account holds drawdown near zero (**$9,955**); the same signals filled full-size with no underwriting bleed to **$9,040** — exactly the raw arm above. Full captured run: [`examples/agent-loop-transcript.md`](examples/agent-loop-transcript.md).
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
@@ -191,6 +203,15 @@ The suite covers the engine math (envelope, governor, indicators, directional + 
 ```json
 { "token": "BNB", "side": "long", "intendedSize": 1000, "entryPrice": 560 }
 ```
+
+**Account context (optional).** An agent can pass its real book so the drawdown governor sizes against the actual account, not a constant. Omit them and they default to `$10,000` / `0.30` / `0`, so existing callers are unchanged:
+
+```json
+{ "token": "BNB", "side": "long", "intendedSize": 1000,
+  "equity": 50000, "ddBudget": 0.2, "currentDrawdown": 0.12 }
+```
+
+`equity` (positive USD), `ddBudget` (drawdown budget in `(0,1]`), `currentDrawdown` (`[0,1)`). As `currentDrawdown` approaches `ddBudget`, size is clamped down; at or beyond it the trade is declined (budget exhausted). The agent carries `currentDrawdown` across the session — see [`examples/agent-loop.ts`](examples/agent-loop.ts).
 
 Response (abridged):
 

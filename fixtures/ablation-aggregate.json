@@ -1,0 +1,584 @@
+{
+  "generated": "2026-06-21T13:48:56.806Z",
+  "framing": "Risk overlay, not an alpha signal. Same momentum entries/exits; only sizing + selection change, at MATCHED average exposure (fullGate vs the equal-exposure flat-haircut arm). Judge on drawdown, not profit. Headline = max drawdown; Calmar is reported honestly and is roughly flat — an exposure-matched overlay is not expected to lift risk-adjusted return, and it doesn't.",
+  "comparison": "fullGate (The Underwriter) vs flatHaircut (equal average exposure) — isolates per-trade selection + risk-based sizing, not 'just less exposure'.",
+  "params": {
+    "rsiMidline": 50,
+    "macd": "12/26/9",
+    "entryGap": 6,
+    "fearGreed": 55,
+    "naiveSize": 12000,
+    "riskFloorRR": 2,
+    "baseRiskPct": 1,
+    "ddBudgetPct": 30
+  },
+  "worstCaseNote": "Sentiment is held gate-open (F&G=55) across all windows ON PURPOSE: it constructs the adverse case the overlay exists for — a momentum agent that keeps taking trades through a downturn instead of standing aside. With real 2022 sentiment (extreme fear) the F&G gate would suppress most bear-market entries, so there would be little to underwrite; forcing the gate open is the harder test, not an easier one.",
+  "regimeNote": "Window regimes are LABELED by an objective classifier (90d return + 200-DMA + ADX) fixed before running — reported as the classifier's own label, not the intended one. The classifier rarely calls a tradeable window a clean 'bull': the cross-50 momentum signal fires too few times in a sustained uptrend, so the strategy's actual tradeable periods are bear / chop / mixed. Every evaluated window is shown, including the ones the overlay loses; see aggregate.byRegime + aggregate.adverseOnly for the per-regime breakout.",
+  "nothingFitted": "All parameters (RSI 50 midline, MACD 12/26/9, 6-bar gap, 1% base risk, 30% DD budget, 2:1 R:R floor) are fixed constants applied identically to every window and asset. No grid search, no per-asset calibration, no walk-forward refit — there is no curve to overfit.",
+  "windows": [
+    {
+      "asset": "BTC",
+      "intendedRegime": "bull",
+      "classifiedRegime": "mixed",
+      "windowReturn": 1.509,
+      "adx": 56,
+      "start": "2023-04-01",
+      "end": "2024-03-14",
+      "trades": 7,
+      "declined": 6,
+      "raw": {
+        "calmar": -0.433,
+        "maxDD": 0.0203,
+        "ret": -0.0088,
+        "exposure": 1.206
+      },
+      "flatHaircut": {
+        "calmar": -0.433,
+        "maxDD": 0.0202,
+        "ret": -0.0088,
+        "exposure": 1.2
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0012,
+        "ret": -0.0012,
+        "exposure": 1.2
+      },
+      "dCalmar": -0.567,
+      "dMaxDD": 0.0191,
+      "exposureDelta": 0,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "BTC",
+      "intendedRegime": "bear",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.659,
+      "adx": 42.6,
+      "start": "2022-04-01",
+      "end": "2022-11-21",
+      "trades": 10,
+      "declined": 6,
+      "raw": {
+        "calmar": -0.78,
+        "maxDD": 0.0341,
+        "ret": -0.0266,
+        "exposure": 1.215
+      },
+      "flatHaircut": {
+        "calmar": -0.78,
+        "maxDD": 0.0293,
+        "ret": -0.0229,
+        "exposure": 1.041
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0193,
+        "ret": -0.0193,
+        "exposure": 1.042
+      },
+      "dCalmar": -0.22,
+      "dMaxDD": 0.01,
+      "exposureDelta": 0.002,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "BTC",
+      "intendedRegime": "chop",
+      "classifiedRegime": "mixed",
+      "windowReturn": -0.177,
+      "adx": 20.3,
+      "start": "2024-04-01",
+      "end": "2024-09-01",
+      "trades": 3,
+      "declined": 2,
+      "raw": {
+        "calmar": -0.794,
+        "maxDD": 0.0705,
+        "ret": -0.056,
+        "exposure": 1.202
+      },
+      "flatHaircut": {
+        "calmar": -0.794,
+        "maxDD": 0.0704,
+        "ret": -0.0559,
+        "exposure": 1.2
+      },
+      "fullGate": {
+        "calmar": null,
+        "maxDD": 0,
+        "ret": 0.0156,
+        "exposure": 1.2
+      },
+      "dCalmar": 10.794,
+      "dMaxDD": 0.0704,
+      "exposureDelta": 0,
+      "improvedCalmar": true,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "ETH",
+      "intendedRegime": "bull",
+      "classifiedRegime": "mixed",
+      "windowReturn": 1.132,
+      "adx": 52.9,
+      "start": "2023-04-01",
+      "end": "2024-03-14",
+      "trades": 7,
+      "declined": 3,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.0238,
+        "ret": -0.0238,
+        "exposure": 1.218
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0224,
+        "ret": -0.0224,
+        "exposure": 1.144
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0138,
+        "ret": -0.0138,
+        "exposure": 1.145
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0085,
+      "exposureDelta": 0.001,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "ETH",
+      "intendedRegime": "bear",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.68,
+      "adx": 41.8,
+      "start": "2022-04-01",
+      "end": "2022-11-21",
+      "trades": 6,
+      "declined": 5,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.1254,
+        "ret": -0.1254,
+        "exposure": 1.28
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0915,
+        "ret": -0.0915,
+        "exposure": 0.917
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.01,
+        "ret": -0.01,
+        "exposure": 0.934
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0815,
+      "exposureDelta": 0.017,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "ETH",
+      "intendedRegime": "chop",
+      "classifiedRegime": "mixed",
+      "windowReturn": -0.177,
+      "adx": 22.7,
+      "start": "2024-05-01",
+      "end": "2024-10-01",
+      "trades": 4,
+      "declined": 2,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.0514,
+        "ret": -0.0514,
+        "exposure": 1.232
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0502,
+        "ret": -0.0502,
+        "exposure": 1.2
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0076,
+        "ret": -0.0076,
+        "exposure": 1.201
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0425,
+      "exposureDelta": 0.001,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "SOL",
+      "intendedRegime": "bull",
+      "classifiedRegime": "mixed",
+      "windowReturn": 8.294,
+      "adx": 29.4,
+      "start": "2023-04-01",
+      "end": "2024-03-18",
+      "trades": 6,
+      "declined": 6,
+      "raw": {
+        "calmar": -0.226,
+        "maxDD": 0.022,
+        "ret": -0.005,
+        "exposure": 1.211
+      },
+      "flatHaircut": {
+        "calmar": 0,
+        "maxDD": 0,
+        "ret": 0,
+        "exposure": 0
+      },
+      "fullGate": {
+        "calmar": 0,
+        "maxDD": 0,
+        "ret": 0,
+        "exposure": 0
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0,
+      "exposureDelta": 0,
+      "improvedCalmar": false,
+      "improvedMaxDD": false
+    },
+    {
+      "asset": "SOL",
+      "intendedRegime": "bear",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.926,
+      "adx": 42.9,
+      "start": "2022-04-01",
+      "end": "2022-12-30",
+      "trades": 13,
+      "declined": 9,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.1944,
+        "ret": -0.1944,
+        "exposure": 1.305
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.1148,
+        "ret": -0.1148,
+        "exposure": 0.743
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0285,
+        "ret": -0.0285,
+        "exposure": 0.77
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0863,
+      "exposureDelta": 0.027,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "SOL",
+      "intendedRegime": "chop",
+      "classifiedRegime": "mixed",
+      "windowReturn": -0.052,
+      "adx": 23.6,
+      "start": "2024-04-15",
+      "end": "2024-09-15",
+      "trades": 7,
+      "declined": 6,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.1039,
+        "ret": -0.1039,
+        "exposure": 1.254
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0994,
+        "ret": -0.0994,
+        "exposure": 1.198
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0047,
+        "ret": -0.0047,
+        "exposure": 1.2
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0947,
+      "exposureDelta": 0.002,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "BNB",
+      "intendedRegime": "bull",
+      "classifiedRegime": "mixed",
+      "windowReturn": 0.916,
+      "adx": 53.3,
+      "start": "2023-04-01",
+      "end": "2024-03-14",
+      "trades": 13,
+      "declined": 7,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.0267,
+        "ret": -0.0267,
+        "exposure": 1.221
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0251,
+        "ret": -0.0251,
+        "exposure": 1.148
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0188,
+        "ret": -0.0188,
+        "exposure": 1.149
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0063,
+      "exposureDelta": 0.001,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "BNB",
+      "intendedRegime": "bear",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.433,
+      "adx": 25.2,
+      "start": "2022-04-01",
+      "end": "2022-11-21",
+      "trades": 7,
+      "declined": 4,
+      "raw": {
+        "calmar": -0.944,
+        "maxDD": 0.0754,
+        "ret": -0.0711,
+        "exposure": 1.263
+      },
+      "flatHaircut": {
+        "calmar": -0.944,
+        "maxDD": 0.0551,
+        "ret": -0.052,
+        "exposure": 0.91
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0212,
+        "ret": -0.0212,
+        "exposure": 0.923
+      },
+      "dCalmar": -0.056,
+      "dMaxDD": 0.0339,
+      "exposureDelta": 0.013,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "BNB",
+      "intendedRegime": "chop",
+      "classifiedRegime": "chop",
+      "windowReturn": -0.026,
+      "adx": 19.3,
+      "start": "2024-05-01",
+      "end": "2024-10-01",
+      "trades": 4,
+      "declined": 2,
+      "raw": {
+        "calmar": -1,
+        "maxDD": 0.0967,
+        "ret": -0.0967,
+        "exposure": 1.27
+      },
+      "flatHaircut": {
+        "calmar": -1,
+        "maxDD": 0.0691,
+        "ret": -0.0691,
+        "exposure": 0.893
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0166,
+        "ret": -0.0166,
+        "exposure": 0.908
+      },
+      "dCalmar": 0,
+      "dMaxDD": 0.0525,
+      "exposureDelta": 0.015,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "CAKE",
+      "intendedRegime": "bull",
+      "classifiedRegime": "mixed",
+      "windowReturn": 0.276,
+      "adx": 27.1,
+      "start": "2023-04-01",
+      "end": "2024-03-14",
+      "trades": 11,
+      "declined": 6,
+      "raw": {
+        "calmar": -0.269,
+        "maxDD": 0.0992,
+        "ret": -0.0267,
+        "exposure": 1.286
+      },
+      "flatHaircut": {
+        "calmar": -0.269,
+        "maxDD": 0.0831,
+        "ret": -0.0224,
+        "exposure": 1.065
+      },
+      "fullGate": {
+        "calmar": 0.038,
+        "maxDD": 0.0207,
+        "ret": 0.0008,
+        "exposure": 1.077
+      },
+      "dCalmar": 0.307,
+      "dMaxDD": 0.0624,
+      "exposureDelta": 0.013,
+      "improvedCalmar": true,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "CAKE",
+      "intendedRegime": "bear",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.66,
+      "adx": 43.3,
+      "start": "2022-04-01",
+      "end": "2022-12-31",
+      "trades": 7,
+      "declined": 5,
+      "raw": {
+        "calmar": -0.89,
+        "maxDD": 0.0857,
+        "ret": -0.0763,
+        "exposure": 1.226
+      },
+      "flatHaircut": {
+        "calmar": -0.89,
+        "maxDD": 0.084,
+        "ret": -0.0747,
+        "exposure": 1.2
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.009,
+        "ret": -0.009,
+        "exposure": 1.2
+      },
+      "dCalmar": -0.11,
+      "dMaxDD": 0.0749,
+      "exposureDelta": 0.001,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    },
+    {
+      "asset": "CAKE",
+      "intendedRegime": "chop",
+      "classifiedRegime": "bear",
+      "windowReturn": -0.613,
+      "adx": 21.9,
+      "start": "2024-04-01",
+      "end": "2024-09-01",
+      "trades": 4,
+      "declined": 3,
+      "raw": {
+        "calmar": -0.633,
+        "maxDD": 0.0165,
+        "ret": -0.0105,
+        "exposure": 1.204
+      },
+      "flatHaircut": {
+        "calmar": -0.633,
+        "maxDD": 0.0165,
+        "ret": -0.0104,
+        "exposure": 1.2
+      },
+      "fullGate": {
+        "calmar": -1,
+        "maxDD": 0.0076,
+        "ret": -0.0076,
+        "exposure": 1.2
+      },
+      "dCalmar": -0.367,
+      "dMaxDD": 0.0089,
+      "exposureDelta": 0,
+      "improvedCalmar": false,
+      "improvedMaxDD": true
+    }
+  ],
+  "excluded": [],
+  "aggregate": {
+    "nWindows": 15,
+    "calmar": {
+      "medianDelta": 0,
+      "meanDelta": 0.652,
+      "improved": 2,
+      "pctImproved": 0.13,
+      "signTestP": 0.9995,
+      "bootstrap95": [
+        -0.148,
+        2.136
+      ]
+    },
+    "maxDD": {
+      "medianDelta": 0.0425,
+      "meanDelta": 0.0435,
+      "improved": 14,
+      "pctImproved": 0.93,
+      "signTestP": 0.0005,
+      "bootstrap95": [
+        0.0273,
+        0.0598
+      ]
+    },
+    "byRegime": {
+      "mixed": {
+        "n": 8,
+        "improvedMaxDD": 7,
+        "medianDMaxDD": 0.0308,
+        "signTestP": 0.0352
+      },
+      "bear": {
+        "n": 6,
+        "improvedMaxDD": 6,
+        "medianDMaxDD": 0.0544,
+        "signTestP": 0.0156
+      },
+      "chop": {
+        "n": 1,
+        "improvedMaxDD": 1,
+        "medianDMaxDD": 0.0525,
+        "signTestP": 0.5
+      }
+    },
+    "adverseOnly": {
+      "label": "bear + chop (where drawdown risk exists)",
+      "n": 7,
+      "improvedMaxDD": 7,
+      "medianDMaxDD": 0.0525,
+      "signTestP": 0.0078
+    },
+    "exposureDeltaMean": 0.006
+  }
+}

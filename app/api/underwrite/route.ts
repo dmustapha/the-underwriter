@@ -88,6 +88,23 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if (body.entryPrice !== undefined && (typeof body.entryPrice !== "number" || !Number.isFinite(body.entryPrice) || body.entryPrice <= 0 || body.entryPrice > MAX_ENTRY_PRICE)) {
     return NextResponse.json({ error: `entryPrice, when provided, must be a positive number <= ${MAX_ENTRY_PRICE}` }, { status: 400 });
   }
+  // [§8] Optional account context. An agent passes its real book (equity, drawdown budget, current
+  // drawdown) so the sizing governor reflects the actual account; omitted fields fall back to the demo
+  // defaults ($10k / 30% / 0), so existing callers are unchanged. Validated so a bad account can never
+  // div-by-zero peakEquity or hand the governor a nonsense budget.
+  const acct = body as { equity?: number; ddBudget?: number; currentDrawdown?: number };
+  if (acct.equity !== undefined && (typeof acct.equity !== "number" || !Number.isFinite(acct.equity) || acct.equity <= 0 || acct.equity > MAX_INTENDED_SIZE)) {
+    return NextResponse.json({ error: `equity, when provided, must be a positive number <= ${MAX_INTENDED_SIZE}` }, { status: 400 });
+  }
+  if (acct.ddBudget !== undefined && (typeof acct.ddBudget !== "number" || !Number.isFinite(acct.ddBudget) || acct.ddBudget <= 0 || acct.ddBudget > 1)) {
+    return NextResponse.json({ error: "ddBudget, when provided, must be a number in (0, 1]" }, { status: 400 });
+  }
+  if (acct.currentDrawdown !== undefined && (typeof acct.currentDrawdown !== "number" || !Number.isFinite(acct.currentDrawdown) || acct.currentDrawdown < 0 || acct.currentDrawdown >= 1)) {
+    return NextResponse.json({ error: "currentDrawdown, when provided, must be a number in [0, 1)" }, { status: 400 });
+  }
+  const acctEquity = acct.equity ?? 10_000;
+  const acctDdBudget = acct.ddBudget ?? 0.3;
+  const acctCurrentDD = acct.currentDrawdown ?? 0;
   const receipts: X402Receipt[] = [];
 
   // x402-enabled pull: a real $0.01 USDC payment on Base → live receipt (on-chain proof in the demo).
@@ -137,7 +154,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const entryPrice = Number.isFinite(entryCandidate) && entryCandidate > 0 ? entryCandidate : 600;
   const signals = toSignals(taData, entryPrice, { fearGreed, altSeason, globalLeverage });
 
-  const state: PortfolioState = { equity: 10000, peakEquity: 10000, ddBudget: 0.3, currentDrawdown: 0 };
+  // [§8] account state from the request (or demo defaults). peakEquity is derived so that
+  // (peak - equity)/peak == currentDrawdown, keeping the governor's budget math consistent.
+  const state: PortfolioState = {
+    equity: acctEquity,
+    peakEquity: acctEquity / (1 - acctCurrentDD),
+    ddBudget: acctDdBudget,
+    currentDrawdown: acctCurrentDD,
+  };
   // Live path opts into the DIRECTIONAL + RSI-aware regime (the backtest/ablation path does NOT, so the
   // earned Day-2 numbers stay byte-identical). Directional: froth shrinks longs, not shorts. RSI: shrink
   // a long that's overbought or a short that's oversold.

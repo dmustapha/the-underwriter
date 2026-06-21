@@ -8,8 +8,9 @@
 import { cmcClient } from "../src/clients/cmcClient";
 import { getKlines } from "../src/clients/binanceClient";
 import { runAblation } from "../src/backtest/ablation";
-import { rsi, computeLevels } from "../src/engine/indicators";
-import { Trade, PortfolioState, Kline } from "../src/types";
+import { computeLevels } from "../src/engine/indicators";
+import { momentumTradeLog } from "../src/signals/momentum";
+import { PortfolioState } from "../src/types";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -44,37 +45,9 @@ const FEAR_GREED = 72;               // demo regime snapshot (greedy/frothy) -> 
 const SCAN_START = "2021-10-01";     // generous warmup so every 2022 entry has >=60 prior bars
 const SCAN_END = "2022-12-31";
 
-// [CRITIQUE E-3] EMA / MACD for the named "RSI + MACD + Fear&Greed momentum skill".
-function ema(values: number[], period: number): number[] {
-  const k = 2 / (period + 1); const out: number[] = []; let prev = values[0];
-  for (let i = 0; i < values.length; i++) { prev = i === 0 ? values[0] : values[i] * k + prev * (1 - k); out.push(prev); }
-  return out;
-}
-function macd(closes: number[]): { line: number[]; signal: number[] } {
-  const e12 = ema(closes, 12), e26 = ema(closes, 26);
-  const line = closes.map((_, i) => e12[i] - e26[i]);
-  return { line, signal: ema(line, 9) };
-}
-
-// [CRITIQUE E-3] Generate the competitor-style momentum trade log: long entries when RSI
-// crosses up through 50 AND MACD is above its signal AND F&G is greedy (>=50). This is the
-// kind of signal skill ~3 other Track-2 teams ship — The Underwriter underwrites it.
-function momentumTradeLog(klines: Kline[], fearGreed: number, size: number): Trade[] {
-  const closes = klines.map((k) => k.close);
-  const { line, signal } = macd(closes);
-  const trades: Trade[] = [];
-  let last = -999; const gap = 6, forward = 30; const fgGate = fearGreed >= 50;
-  // scan from 60 so every entry has the full 60-bar Fibonacci lookback available
-  for (let i = 60; i < klines.length - forward; i++) {
-    const rsiPrev = rsi(closes.slice(0, i));
-    const rsiNow = rsi(closes.slice(0, i + 1));
-    if (rsiPrev < 50 && rsiNow >= 50 && line[i] > signal[i] && fgGate && i - last >= gap) {
-      trades.push({ token: "BNB", side: "long", entryTs: klines[i].openTime, entryPrice: klines[i].close, intendedSize: size });
-      last = i;
-    }
-  }
-  return trades;
-}
+// [CRITIQUE E-3] The competitor-style "RSI + MACD + Fear&Greed momentum skill" now lives in
+// src/signals/momentum.ts (Fix 1) so the multi-window ablation and the agent-loop example reuse
+// the SAME generator. The default token "BNB" keeps this seed byte-identical to before.
 
 async function main(): Promise<void> {
   mkdirSync(FIX, { recursive: true });
