@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { SiteNav } from "../components/SiteNav";
 import { SiteFooter } from "../components/SiteFooter";
 import { ProofDocument } from "../components/ProofDocument";
+import { AblationAggregate } from "../components/AblationAggregate";
 
 export default function Proof() {
   const p = join(process.cwd(), "submission", "proof.md");
@@ -40,6 +41,20 @@ export default function Proof() {
             <span className="uw-eyebrow hidden sm:inline" style={{ color: "var(--paper-45)" }}>Base mainnet</span>
           </div>
           <ProofDocument content={content} />
+        </section>
+
+        {/* ── OUT-OF-SAMPLE ROBUSTNESS (Fix 2) ── */}
+        <section className="border-t py-12" style={{ borderColor: "var(--rule)" }}>
+          <div className="uw-sec-head mb-7">
+            <span className="uw-sec-num">§ II</span>
+            <h2 className="uw-sec-h2">Does it hold up out of sample?</h2>
+            <span className="uw-sec-fill" />
+            <span className="uw-eyebrow hidden sm:inline" style={{ color: "var(--paper-45)" }}>5 assets · 3 regimes</span>
+          </div>
+          <p className="m-0 mb-6 text-[15px]" style={{ lineHeight: 1.6, color: "var(--paper-70)", maxWidth: "62ch" }}>
+            The front-page curve is one window. Here is the same overlay, same fixed parameters, run across five assets and multiple market regimes — judged on drawdown, with a sign test and a bootstrap confidence interval.
+          </p>
+          <AblationAggregate />
         </section>
 
         <p className="mt-2 text-[12px]" style={{ color: "var(--paper-45)", letterSpacing: "0.04em" }}>

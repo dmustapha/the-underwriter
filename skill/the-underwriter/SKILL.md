@@ -76,5 +76,8 @@ Reason:         <one line citing the CMC levels and regime>
 3. `get_global_crypto_derivatives_metrics` is OPTIONAL — skip silently, note "leverage check skipped".
 4. Always deliver a verdict with a reason rather than no answer. The safe default is DECLINE, never an oversized APPROVE.
 
+## Worked example
+A runnable agent loop — a momentum agent calling this skill before every trade, branching on the verdict, carrying account state across the session — is in [`examples/agent-loop.ts`](../../examples/agent-loop.ts) (run `pnpm example`). Captured output: [`examples/agent-loop-transcript.md`](../../examples/agent-loop-transcript.md).
+
 ## Important Notes
 This skill provides risk discipline, not financial advice. Stops and take-profits are read from CoinMarketCap technical levels; sizing is fixed-fractional bounded by a drawdown governor. Backtest your strategy's own trade log through the engine before trusting it live.

@@ -10,7 +10,7 @@ interface EvidencePath {
   escalated: boolean;
   pullsSaved: number;
   naivePulls: number;
-  levelsSource: "live" | "fixture";
+  levelsSource: "cmc" | "live" | "fixture";
   regimeSource: "x402" | "rest" | "cache";
 }
 
@@ -26,6 +26,9 @@ export function UnderwriteDesk() {
   const [side, setSide] = useState<"long" | "short">("long");
   const [size, setSize] = useState(1000);
   const [entry, setEntry] = useState(0); // 0 = use the live/closed-form entry from CMC TA
+  // [§8] optional account context — 0 = omit (route falls back to its $10k / 30% defaults)
+  const [equity, setEquity] = useState(0);
+  const [maxDD, setMaxDD] = useState(0); // percent in the UI; sent as a 0–1 fraction
   const [envelope, setEnvelope] = useState<RiskEnvelope | null>(null);
   const [evidence, setEvidence] = useState<EvidencePath | null>(null);
   const [loading, setLoading] = useState(false);
@@ -46,7 +49,12 @@ export function UnderwriteDesk() {
       const res = await fetch("/api/underwrite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, side, intendedSize: size, ...(entry > 0 ? { entryPrice: entry } : {}) }),
+        body: JSON.stringify({
+          token, side, intendedSize: size,
+          ...(entry > 0 ? { entryPrice: entry } : {}),
+          ...(equity > 0 ? { equity } : {}),                       // [§8] account context (optional)
+          ...(maxDD > 0 ? { ddBudget: Math.min(1, maxDD / 100) } : {}),
+        }),
         signal: controller.signal,
       });
       // [FIX #2] surface the server's own {error} body instead of a raw HTTP code.
@@ -119,6 +127,26 @@ export function UnderwriteDesk() {
             <input className="uw-ctl" type="number" step="any" value={entry || ""} placeholder="live" onChange={(e) => setEntry(Number(e.target.value))} />
             <span className="mt-1.5 block text-[11px] italic" style={{ color: "var(--paper-70)" }}>blank = live quote at submission</span>
           </label>
+
+          {/* [§8] optional account context — an agent passes its real book; blank uses the $10k / 30% defaults */}
+          <details className="mt-5 rounded-[3px]" style={{ border: "1px solid var(--rule)", background: "var(--ink-1)" }}>
+            <summary className="uw-label cursor-pointer select-none px-4 py-3" style={{ color: "var(--paper-70)" }}>Account context (optional)</summary>
+            <div className="grid grid-cols-2 gap-4 px-4 pb-4">
+              <label className="block">
+                <span className="uw-label mb-2 block">Account size (USD)</span>
+                <input className="uw-ctl" type="number" step="any" min={1} value={equity || ""} placeholder="10,000"
+                  onChange={(e) => setEquity(Number(e.target.value))} />
+              </label>
+              <label className="block">
+                <span className="uw-label mb-2 block">Max drawdown (%)</span>
+                <input className="uw-ctl" type="number" step="any" min={1} max={100} value={maxDD || ""} placeholder="30"
+                  onChange={(e) => setMaxDD(Number(e.target.value))} />
+              </label>
+            </div>
+            <p className="px-4 pb-4 text-[11px] italic" style={{ color: "var(--paper-70)" }}>
+              The drawdown governor sizes against this book. Blank = the demo defaults ($10,000 equity, 30% drawdown budget).
+            </p>
+          </details>
 
           <div className="mt-6">
             {/* [FIX #4] disable until the size is a finite positive number */}
@@ -204,8 +232,8 @@ export function UnderwriteDesk() {
                   </div>
                   <div className="flex items-baseline justify-between py-2.5 text-[14px]" style={{ borderBottom: "1px solid var(--rule)", color: "var(--paper-70)" }}>
                     <span>Stop / take-profit levels</span>
-                    <span className="uw-mono text-[12px] font-semibold uppercase" style={{ letterSpacing: "0.12em", color: evidence.levelsSource === "live" ? "var(--brand)" : "var(--paper-45)" }}>
-                      {evidence.levelsSource === "live" ? "live klines" : "fixture fallback"}
+                    <span className="uw-mono text-[12px] font-semibold uppercase" style={{ letterSpacing: "0.12em", color: evidence.levelsSource !== "fixture" ? "var(--brand)" : "var(--paper-45)" }}>
+                      {evidence.levelsSource === "cmc" ? "CMC technical analysis" : evidence.levelsSource === "live" ? "live klines" : "fixture fallback"}
                     </span>
                   </div>
                   {/* [FIX #8] regime provenance completes the data-source story */}

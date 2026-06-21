@@ -7,6 +7,7 @@ import { CMC, CMC_IDS, CHAIN, env } from "../config";
 import { CmcResult, X402Receipt, RawJson } from "../types";
 import { computeLevels } from "../engine/indicators";
 import { getDailyKlinesLive } from "./marketData";
+import { getCmcTechnicalAnalysis } from "./mcpClient";
 import { readFileSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
@@ -137,20 +138,26 @@ export const cmcClient = {
   getTechnicalAnalysisLive: async (
     symbol: string,
     entryHint?: number
-  ): Promise<{ data: RawJson; source: "rest" | "cache"; degraded: boolean; levelsSource: "live" | "fixture" }> => {
-    try {
+  ): Promise<{ data: RawJson; source: "rest" | "cache"; degraded: boolean; levelsSource: "cmc" | "live" | "fixture" }> => {
+    // [Fix 3] Two live level sources race CONCURRENTLY (no added latency vs the klines-only path):
+    //   (a) the CMC Agent Hub technical-analysis tier — real CoinMarketCap fib + pivot + MAs;
+    //   (b) the live Bybit daily-klines path (CMC-method pivots+fib).
+    // CMC is preferred when its levels actually bracket the entry on both sides a meaningful distance
+    // away (validity-gated, never throws); otherwise — e.g. a snapshot price that differs from the
+    // agent's entry, the common demo case — we transparently use the klines result. Both are kicked
+    // off before either is awaited, so wall-clock is max(MCP, klines), not their sum.
+    const cmcId = CMC_IDS[symbol.toUpperCase()];
+    const wantCmc = !!cmcId && Number.isFinite(entryHint) && (entryHint as number) > 0;
+    const cmcPromise = wantCmc ? getCmcTechnicalAnalysis(cmcId, entryHint as number) : Promise.resolve(null);
+
+    const klinesPromise = (async () => {
       const window = await getDailyKlinesLive(symbol); // throws on unsupported/failed
       const lastClose = window[window.length - 1]?.close;
       const entry = Number.isFinite(entryHint) && (entryHint as number) > 0 ? (entryHint as number) : lastClose;
       if (!Number.isFinite(entry) || entry <= 0) throw new Error("no usable entry for level computation");
       const lv = computeLevels(window, entry);
-      // Drop levels that collapse onto the entry. When the entry is the latest close (blank-entry
-      // demo), a floor-trader pivot derived from the last bar can land ~ON that close — the nearest
-      // support is then a hair below entry, the stop distance is ~0, and reward:risk explodes into the
-      // thousands: a technically-valid but absurd "APPROVE" with a stop 0.2% away, the exact opposite
-      // of disciplined risk. A real stop sits a meaningful distance off. Require >=0.5% so a coincident
-      // pivot can't fabricate a hairline stop. (Live-path hygiene; the locked backtest never hits this —
-      // its entries are historical trade prices, never the latest close — so the earned numbers can't move.)
+      // Drop levels that collapse onto the entry (see hygiene note): a coincident pivot a hair below
+      // the latest close would fabricate a near-zero stop and an absurd reward:risk. Require >=0.5%.
       const MIN_GAP = entry * 0.005;
       const support = lv.support.filter((x) => entry - x >= MIN_GAP);
       const resistance = lv.resistance.filter((x) => x - entry >= MIN_GAP);
@@ -159,14 +166,29 @@ export const cmcClient = {
       }
       const data: RawJson = {
         _source: "live Bybit daily klines, CMC-method pivots+fib (request path)",
-        entry: lastClose, // live current price — the offline-entry fallback if caller/quote absent
+        entry: lastClose,
         support_levels: support,
         resistance_levels: resistance,
         fibonacci: lv.fib,
         rsi: lv.rsi,
       };
-      return { data, source: "rest", degraded: false, levelsSource: "live" };
-    } catch {
+      return { data, source: "rest" as const, degraded: false, levelsSource: "live" as const };
+    })();
+
+    const [cmcSettled, klinesSettled] = await Promise.allSettled([cmcPromise, klinesPromise]);
+    if (cmcSettled.status === "fulfilled" && cmcSettled.value) {
+      const cmc = cmcSettled.value;
+      return {
+        data: {
+          _source: "live CoinMarketCap Agent Hub technical analysis (MCP)",
+          entry: entryHint, support_levels: cmc.support, resistance_levels: cmc.resistance,
+          fibonacci: [], rsi: cmc.rsi, levelsProvider: "cmc-mcp",
+        },
+        source: "rest", degraded: false, levelsSource: "cmc",
+      };
+    }
+    if (klinesSettled.status === "fulfilled") return klinesSettled.value;
+    {
       // Fixture fallback (Bybit unreachable). Apply the SAME min-gap hygiene to the frozen levels so a
       // caller entry landing ~on a fixture level can't produce a degenerate near-zero stop / absurd
       // reward:risk. Partition around the resolved entry; if nothing meaningful remains, the levels read
