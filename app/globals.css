@@ -34,12 +34,12 @@
 
   --paper: #f3ebdd;
   --paper-70: rgba(243, 235, 221, 0.70);
-  --paper-45: rgba(243, 235, 221, 0.45);
+  --paper-45: rgba(243, 235, 221, 0.62); /* raised from 0.45 to clear WCAG AA 4.5:1 for muted small text */
   --paper-28: rgba(243, 235, 221, 0.28);
   --paper-14: rgba(243, 235, 221, 0.14);
   --rule: rgba(243, 235, 221, 0.16);
   --rule-strong: rgba(243, 235, 221, 0.32);
-  --clay: #b5654b;
+  --clay: #d3826a; /* lightened from #b5654b to clear WCAG AA 4.5:1 on the dark surfaces (a11y) */
 
   --ink-0: #14100e;
   --ink-1: #1b1612;
@@ -133,7 +133,7 @@ body {
 
 /* ── Editorial type atoms ── */
 .uw-label {
-  font-size: 10px; color: var(--paper-45); font-weight: 600;
+  font-size: 10px; color: var(--paper-70); font-weight: 600;
   letter-spacing: 0.16em; text-transform: uppercase;
   font-family: var(--font-body);
 }

@@ -41,7 +41,7 @@ export function SiteNav() {
           </nav>
         </div>
 
-        <div className="flex w-full items-stretch sm:w-auto">
+        <div className="hidden w-full items-stretch sm:flex sm:w-auto">
           <div className="flex flex-1 flex-col gap-px text-right" style={{ padding: "2px 20px" }}>
             <span className="uw-label" style={{ fontSize: "9.5px", letterSpacing: "0.22em" }}>Fear &amp; Greed</span>
             <span className="uw-serif text-[19px] font-semibold leading-tight" style={{ color: "var(--clay)" }}>19</span>

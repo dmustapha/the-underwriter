@@ -15,7 +15,7 @@ type Block =
   | { kind: "code"; text: string }
   | { kind: "hr" };
 
-function parseBlocks(md: string): Block[] {
+export function parseBlocks(md: string): Block[] {
   const lines = md.replace(/\r\n/g, "\n").split("\n");
   const blocks: Block[] = [];
   let i = 0;
@@ -136,7 +136,7 @@ function shortUrl(url: string): string {
 }
 
 // [FIX #10b] only allow http(s):, mailto:, or relative hrefs — drop javascript: etc.
-function safeHref(href: string): string | null {
+export function safeHref(href: string): string | null {
   const h = href.trim();
   if (/^https?:\/\//i.test(h) || /^mailto:/i.test(h)) return h;
   // relative links: no scheme (no "scheme:" prefix), no protocol-relative "//"
