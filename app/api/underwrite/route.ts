@@ -138,7 +138,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   const signals = toSignals(taData, entryPrice, { fearGreed, altSeason, globalLeverage });
 
   const state: PortfolioState = { equity: 10000, peakEquity: 10000, ddBudget: 0.3, currentDrawdown: 0 };
-  const envelope = underwrite({ token, side: body.side, intendedSize: body.intendedSize }, signals, state, receipts);
+  // Live path opts into the DIRECTIONAL + RSI-aware regime (the backtest/ablation path does NOT, so the
+  // earned Day-2 numbers stay byte-identical). Directional: froth shrinks longs, not shorts. RSI: shrink
+  // a long that's overbought or a short that's oversold.
+  const envelope = underwrite({ token, side: body.side, intendedSize: body.intendedSize }, signals, state, receipts, { side: body.side, useRsi: true });
 
   // [CRITIQUE #4] HONEST evidence scoreboard. The old version reported `pulls = receipts.length`, which
   // only ever counts the ONE x402-payable quote (F&G/altSeason/derivatives are REST/cache, not payable)

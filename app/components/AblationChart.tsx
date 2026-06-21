@@ -74,7 +74,7 @@ export function AblationChart({ result, startEquity = 10000, variant = "chart" }
   }
 
   return (
-    <div>
+    <div role="img" aria-label="equity curves: raw bleeds, full envelope holds">
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -12 }}>
           <XAxis dataKey="t" stroke={C.grid} tick={{ fill: C.muted, fontSize: 11, fontFamily: FONT }} tickLine={false} />

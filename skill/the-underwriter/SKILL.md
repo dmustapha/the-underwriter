@@ -27,7 +27,7 @@ Register the CoinMarketCap MCP server:
 { "mcpServers": { "cmc-mcp": { "url": "https://mcp.coinmarketcap.com/mcp", "headers": { "X-CMC-MCP-API-KEY": "your-api-key" } } } }
 ```
 
-Get an API key from https://pro.coinmarketcap.com/login. For keyless pay-per-call data, use the CMC x402 surface (`@x402/fetch` + a funded Base USDC wallet).
+Get an API key from https://pro.coinmarketcap.com/login. For keyless pay-per-call data, use the CMC x402 surface (`@x402/fetch` + a funded Base USDC wallet). Today only the quotes pull is x402-payable; the regime endpoints use a CMC REST key or degrade to neutral sizing. Each paid pull settles a real USDC micropayment on Base and returns a transaction hash as on-chain proof the data was real.
 
 ## Core Principle
 
@@ -45,13 +45,15 @@ Call `mcp__cmc-mcp__get_crypto_technical_analysis`. Extract: support levels, res
 
 ### Step 3 — Read the market regime (sizing multiplier)
 Call `mcp__cmc-mcp__get_global_metrics_latest` (Fear & Greed, altcoin-season, dominance). Cheap signals first.
-- If the regime is ambiguous (mid-range Fear & Greed), escalate to `mcp__cmc-mcp__get_global_crypto_derivatives_metrics` (global leverage/open interest) — only then. This is value-of-information metering.
+- **Value-of-information metering:** escalate to the expensive `mcp__cmc-mcp__get_global_crypto_derivatives_metrics` (global leverage/open interest) ONLY when the regime is ambiguous (mid-range Fear & Greed). A decisive regime skips that pull — fewer calls and lower latency, while the one on-chain cost stays the single price quote. Buy the expensive signal only when it can change the decision.
+- The regime is **directional**: froth (greed, altcoin rotation, market-risk proxy) shrinks longs but not shorts, and an RSI momentum gate shrinks a long that is overbought or a short that is oversold.
 
 ### Step 4 — Compute the envelope
 - reward:risk = |take-profit − entry| / |entry − stop|. If reward:risk < 2.0 → **DECLINE** (exclude the trade).
-- risk fraction = 1% of equity × regime multiplier (Fear & Greed / altcoin-season / leverage), each frothy reading shrinking size; floor 0.25×.
-- Clamp the risk fraction to 10% of the remaining drawdown budget (drawdown governor) so a single stop-out cannot breach the max-drawdown limit.
+- risk fraction = 1% of equity × regime multiplier; floor 0.25×.
+- Clamp the risk fraction to 10% of the remaining drawdown budget (drawdown governor) so a single stop-out cannot breach the max-drawdown limit. If the remaining budget leaves zero risk capacity → **DECLINE** (hard halt), never a $0 APPROVE.
 - position size (USD) = (equity × risk fraction × entry) / |entry − stop|, capped at the intended size. If capped below intended → **SIZE_DOWN**, else **APPROVE**.
+- Portfolio defaults: equity $10,000, max-drawdown budget 30%. Override these with your own book's equity and disqualification line — they are the one knob a forker changes.
 
 ## Report Structure
 

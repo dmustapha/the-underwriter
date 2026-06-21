@@ -61,18 +61,26 @@ export function EnvelopeCard({ envelope }: { envelope: RiskEnvelope }) {
         <Figure label="Target · resistance" value={envelope.takeProfit.toFixed(2)} />
       </div>
 
+      {/* [FIX #7] a fail-safe DECLINE (signals unavailable) is not a risk verdict —
+          flag it in clay so it reads differently from a real DECLINE. */}
+      {envelope.degraded && (
+        <div className="mt-6 rounded-r-[3px] px-4 py-3 text-[13px]" style={{ background: "rgba(181,101,75,0.1)", borderLeft: "2px solid var(--clay)", color: "var(--clay)", lineHeight: 1.6 }}>
+          Declined fail-safe — signals unavailable, not a risk verdict.
+        </div>
+      )}
+
       <div className="mt-6 rounded-r-[3px] px-4 py-4 text-[13.5px]" style={{ background: "var(--brand-dim)", borderLeft: "2px solid var(--brand)", color: "var(--paper-70)", lineHeight: 1.65 }}>
         {envelope.reason}
       </div>
 
       {envelope.receipts.length > 0 && (
-        <div className="uw-mono mt-4 text-xs" style={{ color: "var(--paper-45)" }}>
+        <div className="uw-mono mt-4 text-xs" style={{ color: "var(--paper-70)" }}>
           {envelope.receipts.map((r, i) => (
             <div key={i} className="flex items-center gap-2">
               <span>{r.endpoint} · ${r.amountUsd}</span>
               {r.txHash
                 ? <a className="uw-link" href={baseScanTx(r.txHash)} target="_blank" rel="noreferrer">BaseScan ↗</a>
-                : <span style={{ color: "var(--paper-28)" }}>(cached)</span>}
+                : <span style={{ color: "var(--paper-70)" }}>(cached)</span>}
             </div>
           ))}
         </div>

@@ -1,6 +1,6 @@
 import { TradeRequest, Signals, RiskEnvelope, PortfolioState, X402Receipt, Side } from "../types";
 import { RISK } from "../config";
-import { regimeMultiplier } from "./regime";
+import { regimeMultiplier, RegimeOpts } from "./regime";
 import { clampRiskFraction } from "./governor";
 
 function nearestBelow(levels: number[], price: number): number | undefined {
@@ -17,7 +17,8 @@ export function underwrite(
   req: TradeRequest,
   s: Signals,
   state: PortfolioState,
-  receipts: X402Receipt[] = []
+  receipts: X402Receipt[] = [],
+  opts: RegimeOpts = {}
 ): RiskEnvelope {
   const entry = s.entryPrice;
   const base = baseEnvelope(req, entry, s, receipts);
@@ -63,7 +64,7 @@ export function underwrite(
   }
 
   // Size off stop distance, scaled by regime, clamped by drawdown governor.
-  const regime = regimeMultiplier(s);
+  const regime = regimeMultiplier(s, opts);
   const intendedRiskFraction = RISK.baseRiskFraction * regime.k;
   const clamp = clampRiskFraction(intendedRiskFraction, state);
   const riskCapital = state.equity * clamp.riskFraction;   // USD at risk

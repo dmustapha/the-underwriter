@@ -210,6 +210,16 @@ body {
   100% { box-shadow: 0 0 0 0 rgba(200, 162, 74, 0); }
 }
 
+/* ── Loading spinner (gold ring) — used by the underwrite desk ── */
+.uw-spinner {
+  width: 12px; height: 12px; flex: none;
+  border-radius: 999px;
+  border: 2px solid var(--brand-glow);
+  border-top-color: var(--brand);
+  animation: uw-spin 0.7s linear infinite;
+}
+@keyframes uw-spin { to { transform: rotate(360deg); } }
+
 /* ── Section eyebrow head (numbered band) ── */
 .uw-sec-head { display: flex; align-items: baseline; gap: 18px; }
 .uw-sec-num { font-family: var(--font-display); font-style: italic; color: var(--brand); font-size: 15px; }

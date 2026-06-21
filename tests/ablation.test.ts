@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { runAblation } from "../src/backtest/ablation";
+import { getKlines } from "../src/clients/binanceClient";
 import { Kline, Trade, PortfolioState } from "../src/types";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 // synthetic kline series: choppy then trend, enough bars for fib lookback.
 function makeKlines(n: number): Kline[] {
@@ -36,5 +39,29 @@ describe("ablation harness", () => {
   });
   it("computes a finite Calmar per arm", () => {
     for (const a of result.arms) expect(Number.isNaN(a.calmar)).toBe(false);
+  });
+});
+
+// GATE MARGIN LOCK — the headline rests on fullGate beating flatHaircut at EQUAL exposure on the
+// committed inputs. Reproduces fixtures/ablation.json from fixtures/trade-log.json + the cached klines
+// fixture (cache key matches the CLI's warmup math: fibLookback+10 bars back, 30 forward, 1d bars).
+// getKlines reads the committed cache fixture (no network). A regression that erodes the edge fails here.
+describe("ablation GATE margin lock (committed fixtures)", () => {
+  const trades = JSON.parse(
+    readFileSync(join(process.cwd(), "fixtures", "trade-log.json"), "utf8")
+  ) as Trade[];
+
+  it("fullGate.calmar - flatHaircut.calmar > 0.05 at equal exposure", async () => {
+    // cache key derived from the CLI: start = min(entryTs) - 70*1d, end = max(entryTs) + 30*1d.
+    const klines = await getKlines("BNBUSDT", "1d", 1634515200000, 1671926400000);
+    const result = runAblation(trades, klines, state, { fearGreed: 72, altSeason: 65, globalLeverage: 68 });
+
+    const fg = result.arms.find((a) => a.arm === "fullGate")!;
+    const fh = result.arms.find((a) => a.arm === "flatHaircut")!;
+
+    // equal-exposure invariant: the haircut solves c on RAW exposure, but realized equity drifts as
+    // trades resolve, so the executed averages match within ~2% (precision 1), not to the cent.
+    expect(fh.avgExposure).toBeCloseTo(fg.avgExposure, 1);
+    expect(fg.calmar - fh.calmar).toBeGreaterThan(0.05);        // the locked margin (committed: ~0.611)
   });
 });

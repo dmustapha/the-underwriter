@@ -1,6 +1,7 @@
 import { getKlines } from "../clients/binanceClient";
 import { runAblation } from "../backtest/ablation";
 import { Trade, PortfolioState } from "../types";
+import { INDI } from "../config";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
@@ -14,7 +15,10 @@ async function main(): Promise<void> {
   // entry, so the lookback must scale with the bar size (5 calendar days = 5 daily bars,
   // not enough). 70 bars back / 30 forward guarantees seed and CLI fetch identical klines.
   const barMs = interval === "1d" ? 86_400_000 : interval === "4h" ? 4 * 3_600_000 : interval === "15m" ? 15 * 60_000 : 3_600_000;
-  const start = Math.min(...trades.map((t) => t.entryTs)) - 70 * barMs;
+  // [E6] warmup derived from the engine lookback (not a magic 70) so the two can't silently drift if
+  // INDI.fibLookback changes. fibLookback(60) + 10 headroom = 70 — identical to the prior constant.
+  const warmup = INDI.fibLookback + 10;
+  const start = Math.min(...trades.map((t) => t.entryTs)) - warmup * barMs;
   const end = Math.max(...trades.map((t) => t.entryTs)) + 30 * barMs;
 
   const klines = await getKlines(symbol, interval, start, end);
@@ -30,8 +34,16 @@ async function main(): Promise<void> {
   console.log(`haircut constant (equal-exposure): ${result.haircutConstant.toFixed(3)}`);
   const fg = result.arms.find((a) => a.arm === "fullGate")!;
   const fh = result.arms.find((a) => a.arm === "flatHaircut")!;
-  const verdict = fg.calmar > fh.calmar ? "GO — full gate beats flat haircut at equal exposure" : "NO-GO — switch to backup (Budgeted Decisioner)";
-  console.log(`\nDAY-2 GATE: ${verdict} (fullGate Calmar ${fg.calmar.toFixed(2)} vs flatHaircut ${fh.calmar.toFixed(2)})`);
+  // [E4] margin guard: the headline rests on fullGate beating flatHaircut at equal exposure. Calmar
+  // scale-invariance can make a near-tie ambiguous, so a sub-epsilon gap reads INCONCLUSIVE rather than
+  // a false GO. The current fixture clears this with a wide margin.
+  const margin = fg.calmar - fh.calmar;
+  const verdict = margin > 1e-6
+    ? "GO — full gate beats flat haircut at equal exposure"
+    : margin < -1e-6
+      ? "NO-GO — switch to backup (Budgeted Decisioner)"
+      : "INCONCLUSIVE — equal Calmar at equal exposure";
+  console.log(`\nDAY-2 GATE: ${verdict} (fullGate Calmar ${fg.calmar.toFixed(2)} vs flatHaircut ${fh.calmar.toFixed(2)}, margin ${margin.toFixed(3)})`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });

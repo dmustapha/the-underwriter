@@ -2,7 +2,9 @@
 // inside a seal ring. Fuses the product's two signatures: the APPROVE wax seal and
 // the line the Underwriter draws *under* every trade (the support/stop floor).
 // Pure SVG, inherits the Tearsheet gold; scales from 16px favicon to the masthead.
-export function Logomark({ size = 30, className }: { size?: number; className?: string }) {
+// `decorative` hides the mark from the a11y tree — pass it when the Logomark
+// sits inside an already-labeled link, so the name isn't announced twice. [FIX #13]
+export function Logomark({ size = 30, className, decorative = false }: { size?: number; className?: string; decorative?: boolean }) {
   return (
     <svg
       width={size}
@@ -10,8 +12,9 @@ export function Logomark({ size = 30, className }: { size?: number; className?: 
       viewBox="0 0 64 64"
       fill="none"
       className={className}
-      role="img"
-      aria-label="The Underwriter"
+      role={decorative ? undefined : "img"}
+      aria-label={decorative ? undefined : "The Underwriter"}
+      aria-hidden={decorative ? true : undefined}
     >
       <circle cx="32" cy="32" r="30.5" stroke="var(--brand-glow)" strokeWidth="1.4" />
       <path

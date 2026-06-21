@@ -103,7 +103,7 @@ export default function ForkPage() {
                     {s.n === "02" && (
                       <div className="mt-4">
                         <CopyTile label="Register the CoinMarketCap MCP server" code={mcpJson} />
-                        <p className="m-0 mt-3 text-[12.5px]" style={{ color: "var(--paper-45)", lineHeight: 1.6 }}>
+                        <p className="m-0 mt-3 text-[12.5px]" style={{ color: "var(--paper-70)", lineHeight: 1.6 }}>
                           Get an API key from <a className="uw-link" href="https://pro.coinmarketcap.com/login" target="_blank" rel="noreferrer">pro.coinmarketcap.com ↗</a>. For keyless pay-per-call data, the skill falls back to the CMC x402 surface with a funded Base USDC wallet.
                         </p>
                       </div>
@@ -154,7 +154,7 @@ export default function ForkPage() {
               </div>
             ))}
           </div>
-          <p className="mt-7 text-[13px]" style={{ color: "var(--paper-45)", lineHeight: 1.65, maxWidth: "64ch" }}>
+          <p className="mt-7 text-[13px]" style={{ color: "var(--paper-70)", lineHeight: 1.65, maxWidth: "64ch" }}>
             The skill provides risk discipline, not financial advice. Backtest your own trade log through the engine before trusting it live — the same equal-exposure ablation you can read on the <a className="uw-link" href="/proof">proof page</a>.
           </p>
         </section>

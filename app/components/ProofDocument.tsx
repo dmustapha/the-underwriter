@@ -12,6 +12,7 @@ type Block =
   | { kind: "ul"; items: string[] }
   | { kind: "quote"; text: string }
   | { kind: "table"; header: string[]; rows: string[][] }
+  | { kind: "code"; text: string }
   | { kind: "hr" };
 
 function parseBlocks(md: string): Block[] {
@@ -27,6 +28,16 @@ function parseBlocks(md: string): Block[] {
     const trimmed = line.trim();
 
     if (!trimmed) { i++; continue; }
+
+    // [FIX #10a] fenced code block — gather verbatim lines until the closing ```
+    if (/^```/.test(trimmed)) {
+      i++; // skip opening fence
+      const buf: string[] = [];
+      while (i < lines.length && !/^```/.test(lines[i].trim())) { buf.push(lines[i]); i++; }
+      if (i < lines.length) i++; // skip closing fence
+      blocks.push({ kind: "code", text: buf.join("\n") });
+      continue;
+    }
 
     if (/^---+$/.test(trimmed)) { blocks.push({ kind: "hr" }); i++; continue; }
 
@@ -124,8 +135,20 @@ function shortUrl(url: string): string {
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "") + " ↗";
 }
 
+// [FIX #10b] only allow http(s):, mailto:, or relative hrefs — drop javascript: etc.
+function safeHref(href: string): string | null {
+  const h = href.trim();
+  if (/^https?:\/\//i.test(h) || /^mailto:/i.test(h)) return h;
+  // relative links: no scheme (no "scheme:" prefix), no protocol-relative "//"
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(h) && !h.startsWith("//")) return h;
+  return null;
+}
+
 function Anchor({ href, label }: { href: string; label: string }) {
-  return <a className="uw-link" href={href} target="_blank" rel="noreferrer">{label}</a>;
+  const safe = safeHref(href);
+  // a blocked scheme renders as inert text rather than a clickable link
+  if (!safe) return <span style={{ color: "var(--paper-70)" }}>{label}</span>;
+  return <a className="uw-link" href={safe} target="_blank" rel="noreferrer">{label}</a>;
 }
 
 export function ProofDocument({ content }: { content: string }) {
@@ -147,6 +170,12 @@ export function ProofDocument({ content }: { content: string }) {
               );
             case "h3":
               return <h4 key={key} className="uw-label mb-2 mt-6" style={{ fontSize: "11px", color: "var(--brand)" }}>{inline(b.text, key)}</h4>;
+            case "code":
+              return (
+                <pre key={key} className="uw-mono my-5 overflow-x-auto rounded-[3px] px-4 py-3.5 text-[12.5px]" style={{ background: "var(--ink-0)", border: "1px solid var(--rule)", color: "var(--paper-70)", lineHeight: 1.6 }}>
+                  <code>{b.text}</code>
+                </pre>
+              );
             case "hr":
               return <hr key={key} className="my-7 border-0" style={{ height: 1, background: "var(--rule)" }} />;
             case "quote":

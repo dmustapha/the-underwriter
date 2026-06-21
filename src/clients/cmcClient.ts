@@ -29,8 +29,15 @@ function makePayingFetch(): typeof fetch {
     // = (x402Version: number, paymentRequirements: PaymentRequirements[]) => PaymentRequirements
     // (DEV-001: ARCHITECTURE §10 annotated the first param as `string`; the installed
     // @x402/core 2.15 types it as `number`. Annotations dropped so they infer correctly.)
-    paymentRequirementsSelector: (_v, accepts) =>
-      accepts.filter((a) => BigInt(a.amount) <= CMC.maxCallUnits)[0],
+    // [T0-3] budget guard: reject any 402 demanding more than maxCallUnits. A malformed `amount`
+    // (non-numeric) must not throw inside BigInt() — skip it; if nothing is affordable, return
+    // undefined → the x402 lib makes no payment → paidGet's try/catch falls back cleanly.
+    paymentRequirementsSelector: (_v, accepts) => {
+      const affordable = accepts.filter((a) => {
+        try { return BigInt(a.amount) <= CMC.maxCallUnits; } catch { return false; }
+      });
+      return affordable[0];
+    },
   });
 }
 
@@ -63,10 +70,19 @@ async function paidGet<T = unknown>(key: string, path: string): Promise<CmcResul
       let receipt: X402Receipt | undefined;
       const h = res.headers.get("PAYMENT-RESPONSE");
       if (h) {
+        // [T0-1] The payment ALREADY settled on-chain by the time this header arrives. A decode failure
+        // must NOT discard the result and fall through to a fallback — that would lose proof of money
+        // already spent. Record the receipt regardless; only the txHash may be unknown on a parse error.
         // verified live (2026-06-18): settlement header decodes to { success, txHash, networkId, x402FlowId }.
         // ARCHITECTURE §10 read `decoded.transaction` (wrong) — the real field is `txHash` (DEV-009).
-        const decoded = decodePaymentResponseHeader(h) as { txHash?: string; transaction?: string };
-        receipt = { endpoint: path, amountUsd: 0.01, txHash: decoded.txHash ?? decoded.transaction ?? "", source: "x402" };
+        let txHash = "";
+        try {
+          const decoded = decodePaymentResponseHeader(h) as { txHash?: string; transaction?: string };
+          txHash = decoded.txHash ?? decoded.transaction ?? "";
+        } catch {
+          /* malformed header — keep the receipt with an empty txHash, never drop the settled payment */
+        }
+        receipt = { endpoint: path, amountUsd: 0.01, txHash, source: "x402" };
       }
       cacheWrite(key, data);
       return { data, source: "x402", receipt };
