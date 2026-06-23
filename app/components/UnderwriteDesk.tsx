@@ -125,7 +125,9 @@ export function UnderwriteDesk() {
             <span className="uw-label mb-2 block">Entry</span>
             {/* [FIX #4] allow fractional prices; clarify blank = live quote */}
             <input className="uw-ctl" type="number" step="any" value={entry || ""} placeholder="live" onChange={(e) => setEntry(Number(e.target.value))} />
-            <span className="mt-1.5 block text-[11px] italic" style={{ color: "var(--paper-70)" }}>blank = live quote at submission</span>
+            <span className="mt-1.5 block text-[11px] italic" style={{ color: "var(--paper-70)" }}>
+              blank = live quote at submission. For an <span style={{ color: "var(--brand)", fontStyle: "normal" }}>APPROVE</span>, set the entry a few % below the live price (near support); at or above it, watch it <span style={{ color: "var(--clay)", fontStyle: "normal" }}>DECLINE</span> — that&apos;s the discipline.
+            </span>
           </label>
 
           {/* [§8] optional account context — an agent passes its real book; blank uses the $10k / 30% defaults */}

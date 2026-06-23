@@ -150,6 +150,8 @@ It declines 7 trades (reward below the 2:1 floor), sizes down 4, approves 2. The
 3. Enter a size, and optionally an entry price. Leave entry blank to use the live quote.
 4. Click **Underwrite this trade**.
 5. Read the verdict, the stop and target, the reward:risk, and the reason.
+   - **To see an APPROVE,** set the entry a few percent *below* the live price (near support) — tight risk, real room to the target.
+   - **To see a DECLINE,** enter at or above the live price (near resistance) — the reward no longer clears the 2:1 floor. Saying no to a bad-priced trade is the point, not a bug.
 6. Open the on-chain receipt on the envelope to verify the data pull settled on Base.
 
 ---
